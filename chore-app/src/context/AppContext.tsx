@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, useState, type ReactNode } from 'react';
 import type { AppState, AppAction, TeamMember, Chore } from '../types';
 
 const STORAGE_KEY = 'chore-app-data';
@@ -7,6 +7,18 @@ const initialState: AppState = {
   teamMembers: [],
   chores: [],
 };
+
+function loadFromStorage(): AppState {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (error) {
+    console.error('Error loading state from localStorage:', error);
+  }
+  return initialState;
+}
 
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
@@ -85,29 +97,23 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(appReducer, initialState);
+  const [state, dispatch] = useReducer(appReducer, null, loadFromStorage);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
-  // Load state from localStorage on mount
+  // Mark as loaded after first render
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        dispatch({ type: 'LOAD_STATE', payload: parsed });
-      }
-    } catch (error) {
-      console.error('Error loading state from localStorage:', error);
-    }
+    setHasLoaded(true);
   }, []);
 
-  // Save state to localStorage on change
+  // Save state to localStorage on change (only after initial load)
   useEffect(() => {
+    if (!hasLoaded) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (error) {
       console.error('Error saving state to localStorage:', error);
     }
-  }, [state]);
+  }, [state, hasLoaded]);
 
   const addMember = (member: Omit<TeamMember, 'id'>) => {
     const id = crypto.randomUUID();
