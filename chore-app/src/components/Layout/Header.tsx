@@ -1,4 +1,5 @@
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface HeaderProps {
   onAddChore: () => void;
@@ -7,6 +8,7 @@ interface HeaderProps {
 
 export function Header({ onAddChore, onManageTeam }: HeaderProps) {
   const { state } = useApp();
+  const { user, logout } = useAuth();
 
   const upcomingCount = getUpcomingChoresCount(state.chores);
   const overdueCount = getOverdueChoresCount(state.chores);
@@ -29,7 +31,7 @@ export function Header({ onAddChore, onManageTeam }: HeaderProps) {
             )}
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
           <button
             onClick={onManageTeam}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -42,6 +44,15 @@ export function Header({ onAddChore, onManageTeam }: HeaderProps) {
           >
             + Add Chore
           </button>
+          <div className="ml-4 pl-4 border-l border-gray-200 flex items-center gap-3">
+            <span className="text-sm text-gray-600">{user?.email}</span>
+            <button
+              onClick={logout}
+              className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </header>

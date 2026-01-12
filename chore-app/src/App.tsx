@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { AuthProvider } from './context/AuthContext';
+import { AuthGuard } from './components/Auth/AuthGuard';
 import { AppProvider } from './context/AppContext';
 import { Header } from './components/Layout/Header';
 import { Sidebar } from './components/Layout/Sidebar';
@@ -73,9 +75,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <AuthProvider>
+      <AuthGuard>
+        <AppProvider>
+          <AppContent />
+        </AppProvider>
+      </AuthGuard>
+    </AuthProvider>
   );
 }
 

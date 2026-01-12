@@ -1,24 +1,14 @@
-import { createContext, useContext, useReducer, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, useState, useCallback, type ReactNode } from 'react';
 import type { AppState, AppAction, TeamMember, Chore } from '../types';
-
-const STORAGE_KEY = 'chore-app-data';
+import { fetchTeamMembers, createTeamMember, updateTeamMember as updateTeamMemberApi, deleteTeamMember as deleteTeamMemberApi } from '../services/teamMemberService';
+import { fetchChores, createChore, updateChore as updateChoreApi, deleteChore as deleteChoreApi } from '../services/choreService';
+import { toggleCompletion } from '../services/completionService';
+import pb from '../services/pocketbase';
 
 const initialState: AppState = {
   teamMembers: [],
   chores: [],
 };
-
-function loadFromStorage(): AppState {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      return JSON.parse(saved);
-    }
-  } catch (error) {
-    console.error('Error loading state from localStorage:', error);
-  }
-  return initialState;
-}
 
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
@@ -37,7 +27,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         teamMembers: state.teamMembers.filter(m => m.id !== action.payload),
-        // Unassign chores from deleted member
         chores: state.chores.map(c =>
           c.assigneeId === action.payload ? { ...c, assigneeId: null } : c
         ),
@@ -85,78 +74,166 @@ function appReducer(state: AppState, action: AppAction): AppState {
 interface AppContextType {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
-  addMember: (member: Omit<TeamMember, 'id'>) => void;
-  updateMember: (member: TeamMember) => void;
-  deleteMember: (id: string) => void;
-  addChore: (chore: Omit<Chore, 'id' | 'completed'>) => void;
-  updateChore: (chore: Chore) => void;
-  deleteChore: (id: string) => void;
-  toggleChoreCompletion: (choreId: string, date: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  addMember: (member: Omit<TeamMember, 'id'>) => Promise<void>;
+  updateMember: (member: TeamMember) => Promise<void>;
+  deleteMember: (id: string) => Promise<void>;
+  addChore: (chore: Omit<Chore, 'id' | 'completed' | 'owner'>) => Promise<void>;
+  updateChore: (chore: Chore) => Promise<void>;
+  deleteChore: (id: string) => Promise<void>;
+  toggleChoreCompletion: (choreId: string, date: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(appReducer, null, loadFromStorage);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [state, dispatch] = useReducer(appReducer, initialState);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mark as loaded after first render
-  useEffect(() => {
-    setHasLoaded(true);
+  const loadData = useCallback(async () => {
+    try {
+      setError(null);
+      const [teamMembers, chores] = await Promise.all([
+        fetchTeamMembers(),
+        fetchChores(),
+      ]);
+      dispatch({ type: 'LOAD_STATE', payload: { teamMembers, chores } });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to load data';
+      setError(message);
+      console.error('Error loading data:', err);
+    }
   }, []);
 
-  // Save state to localStorage on change (only after initial load)
   useEffect(() => {
-    if (!hasLoaded) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (error) {
-      console.error('Error saving state to localStorage:', error);
+    async function init() {
+      setIsLoading(true);
+      await loadData();
+      setIsLoading(false);
     }
-  }, [state, hasLoaded]);
+    init();
 
-  const addMember = (member: Omit<TeamMember, 'id'>) => {
-    const id = crypto.randomUUID();
-    dispatch({ type: 'ADD_MEMBER', payload: { ...member, id } });
+    // Subscribe to real-time updates
+    const unsubscribes: (() => void)[] = [];
+
+    pb.collection('chores').subscribe('*', () => {
+      loadData();
+    }).then(unsub => unsubscribes.push(unsub));
+
+    pb.collection('team_members').subscribe('*', () => {
+      loadData();
+    }).then(unsub => unsubscribes.push(unsub));
+
+    pb.collection('chore_completions').subscribe('*', () => {
+      loadData();
+    }).then(unsub => unsubscribes.push(unsub));
+
+    return () => {
+      unsubscribes.forEach(unsub => unsub());
+    };
+  }, [loadData]);
+
+  const addMember = async (member: Omit<TeamMember, 'id'>) => {
+    try {
+      const created = await createTeamMember(member);
+      dispatch({ type: 'ADD_MEMBER', payload: created });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to add member';
+      setError(message);
+      throw err;
+    }
   };
 
-  const updateMember = (member: TeamMember) => {
-    dispatch({ type: 'UPDATE_MEMBER', payload: member });
+  const updateMember = async (member: TeamMember) => {
+    try {
+      const updated = await updateTeamMemberApi(member);
+      dispatch({ type: 'UPDATE_MEMBER', payload: updated });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update member';
+      setError(message);
+      throw err;
+    }
   };
 
-  const deleteMember = (id: string) => {
-    dispatch({ type: 'DELETE_MEMBER', payload: id });
+  const deleteMember = async (id: string) => {
+    try {
+      await deleteTeamMemberApi(id);
+      dispatch({ type: 'DELETE_MEMBER', payload: id });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete member';
+      setError(message);
+      throw err;
+    }
   };
 
-  const addChore = (chore: Omit<Chore, 'id' | 'completed'>) => {
-    const id = crypto.randomUUID();
-    dispatch({ type: 'ADD_CHORE', payload: { ...chore, id, completed: [] } });
+  const addChore = async (chore: Omit<Chore, 'id' | 'completed' | 'owner'>) => {
+    try {
+      const created = await createChore(chore);
+      dispatch({ type: 'ADD_CHORE', payload: created });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to add chore';
+      setError(message);
+      throw err;
+    }
   };
 
-  const updateChore = (chore: Chore) => {
-    dispatch({ type: 'UPDATE_CHORE', payload: chore });
+  const updateChore = async (chore: Chore) => {
+    try {
+      const updated = await updateChoreApi(chore);
+      dispatch({ type: 'UPDATE_CHORE', payload: updated });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update chore';
+      setError(message);
+      throw err;
+    }
   };
 
-  const deleteChore = (id: string) => {
-    dispatch({ type: 'DELETE_CHORE', payload: id });
+  const deleteChore = async (id: string) => {
+    try {
+      await deleteChoreApi(id);
+      dispatch({ type: 'DELETE_CHORE', payload: id });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete chore';
+      setError(message);
+      throw err;
+    }
   };
 
-  const toggleChoreCompletion = (choreId: string, date: string) => {
-    dispatch({ type: 'TOGGLE_CHORE_COMPLETION', payload: { choreId, date } });
+  const toggleChoreCompletionFn = async (choreId: string, date: string) => {
+    try {
+      await toggleCompletion(choreId, date);
+      dispatch({ type: 'TOGGLE_CHORE_COMPLETION', payload: { choreId, date } });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to toggle completion';
+      setError(message);
+      throw err;
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
+      </div>
+    );
+  }
 
   return (
     <AppContext.Provider
       value={{
         state,
         dispatch,
+        isLoading,
+        error,
         addMember,
         updateMember,
         deleteMember,
         addChore,
         updateChore,
         deleteChore,
-        toggleChoreCompletion,
+        toggleChoreCompletion: toggleChoreCompletionFn,
       }}
     >
       {children}
