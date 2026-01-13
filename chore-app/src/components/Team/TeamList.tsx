@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import type { TeamMember } from '../../types';
 import { MemberForm } from './MemberForm';
 
@@ -10,8 +11,11 @@ interface TeamListProps {
 
 export function TeamList({ isOpen, onClose }: TeamListProps) {
   const { state, deleteMember } = useApp();
+  const { user } = useAuth();
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [isAddingMember, setIsAddingMember] = useState(false);
+
+  const canDelete = (member: TeamMember) => member.owner === user?.id || user?.isAdmin;
 
   if (!isOpen) return null;
 
@@ -58,16 +62,18 @@ export function TeamList({ isOpen, onClose }: TeamListProps) {
                     >
                       Edit
                     </button>
-                    <button
-                      onClick={() => {
-                        if (confirm(`Remove ${member.name} from the team?`)) {
-                          deleteMember(member.id);
-                        }
-                      }}
-                      className="text-sm text-red-600 hover:text-red-800"
-                    >
-                      Remove
-                    </button>
+                    {canDelete(member) && (
+                      <button
+                        onClick={() => {
+                          if (confirm(`Remove ${member.name} from the team?`)) {
+                            deleteMember(member.id);
+                          }
+                        }}
+                        className="text-sm text-red-600 hover:text-red-800"
+                      >
+                        Remove
+                      </button>
+                    )}
                   </div>
                 </li>
               ))}

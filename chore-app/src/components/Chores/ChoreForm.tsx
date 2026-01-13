@@ -20,7 +20,8 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
   const { state, addChore, updateChore, deleteChore } = useApp();
   const { user } = useAuth();
   const isOwner = !chore || chore.owner === user?.id;
-  const isReadOnly = !!(chore && !isOwner);
+  const canEdit = isOwner || user?.isAdmin;
+  const isReadOnly = !!(chore && !canEdit);
 
   const [title, setTitle] = useState(chore?.title || '');
   const [description, setDescription] = useState(chore?.description || '');
@@ -199,7 +200,7 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
             )}
 
             <div className="flex gap-3 pt-4">
-              {chore && isOwner && (
+              {chore && canEdit && (
                 <button
                   type="button"
                   onClick={handleDelete}

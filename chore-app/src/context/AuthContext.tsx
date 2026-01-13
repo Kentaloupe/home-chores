@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import pb from '../services/pocketbase';
 import type { AuthUser } from '../types';
+import { isAdminEmail } from '../config/admin';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -22,18 +23,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (pb.authStore.isValid && pb.authStore.model) {
+      const email = pb.authStore.model.email;
       setUser({
         id: pb.authStore.model.id,
-        email: pb.authStore.model.email,
+        email,
+        isAdmin: isAdminEmail(email),
       });
     }
     setIsLoading(false);
 
     const unsubscribe = pb.authStore.onChange(() => {
       if (pb.authStore.isValid && pb.authStore.model) {
+        const email = pb.authStore.model.email;
         setUser({
           id: pb.authStore.model.id,
-          email: pb.authStore.model.email,
+          email,
+          isAdmin: isAdminEmail(email),
         });
       } else {
         setUser(null);

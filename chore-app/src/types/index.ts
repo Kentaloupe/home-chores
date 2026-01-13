@@ -2,6 +2,7 @@ export interface TeamMember {
   id: string;
   name: string;
   color: string;
+  owner: string;
 }
 
 export interface Chore {
@@ -39,4 +40,5 @@ export interface RecurrenceOption {
 export interface AuthUser {
   id: string;
   email: string;
+  isAdmin: boolean;
 }

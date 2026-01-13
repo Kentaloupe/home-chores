@@ -76,7 +76,7 @@ interface AppContextType {
   dispatch: React.Dispatch<AppAction>;
   isLoading: boolean;
   error: string | null;
-  addMember: (member: Omit<TeamMember, 'id'>) => Promise<void>;
+  addMember: (member: Omit<TeamMember, 'id' | 'owner'>) => Promise<void>;
   updateMember: (member: TeamMember) => Promise<void>;
   deleteMember: (id: string) => Promise<void>;
   addChore: (chore: Omit<Chore, 'id' | 'completed' | 'owner'>) => Promise<void>;
@@ -135,7 +135,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   }, [loadData]);
 
-  const addMember = async (member: Omit<TeamMember, 'id'>) => {
+  const addMember = async (member: Omit<TeamMember, 'id' | 'owner'>) => {
     try {
       const created = await createTeamMember(member);
       dispatch({ type: 'ADD_MEMBER', payload: created });
