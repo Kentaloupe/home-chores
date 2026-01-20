@@ -125,7 +125,21 @@ export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4">
+    <div className="bg-white rounded-lg shadow-sm p-4 calendar-container">
+      <style>{`
+        .calendar-container .fc-daygrid-event {
+          margin-bottom: 2px !important;
+        }
+        .calendar-container .fc-daygrid-day-events {
+          min-height: auto !important;
+        }
+        .calendar-container .fc-daygrid-event-harness {
+          margin-top: 1px !important;
+        }
+        .calendar-container .fc-event {
+          border-radius: 4px !important;
+        }
+      `}</style>
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -140,7 +154,8 @@ export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
         eventClick={handleEventClick}
         height="auto"
         eventDisplay="block"
-        dayMaxEvents={3}
+        dayMaxEvents={false}
+        eventOrder="start,-duration,allDay,title"
         eventContent={renderEventContent}
       />
     </div>
