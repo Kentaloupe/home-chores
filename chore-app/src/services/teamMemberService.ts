@@ -8,6 +8,7 @@ export async function fetchTeamMembers(): Promise<TeamMember[]> {
     name: record.name,
     color: record.color,
     region: (record.region || 'BC') as Region,
+    managerId: record.manager || null,
     owner: record.owner,
   }));
 }
@@ -19,6 +20,7 @@ export async function createTeamMember(
     name: member.name,
     color: member.color,
     region: member.region,
+    manager: member.managerId || '',
     owner: pb.authStore.model?.id,
   });
   return {
@@ -26,6 +28,7 @@ export async function createTeamMember(
     name: record.name,
     color: record.color,
     region: record.region as Region,
+    managerId: record.manager || null,
     owner: record.owner,
   };
 }
@@ -35,12 +38,14 @@ export async function updateTeamMember(member: TeamMember): Promise<TeamMember> 
     name: member.name,
     color: member.color,
     region: member.region,
+    manager: member.managerId || '',
   });
   return {
     id: record.id,
     name: record.name,
     color: record.color,
     region: record.region as Region,
+    managerId: record.manager || null,
     owner: record.owner,
   };
 }

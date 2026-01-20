@@ -54,10 +54,17 @@ export function TeamList({ isOpen, onClose }: TeamListProps) {
                       style={{ backgroundColor: member.color }}
                     />
                     <div>
-                      <span className="font-medium text-gray-900">{member.name}</span>
-                      <span className="ml-2 text-xs text-gray-500 bg-gray-200 px-1.5 py-0.5 rounded">
-                        {member.region}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-900">{member.name}</span>
+                        <span className="text-xs text-gray-500 bg-gray-200 px-1.5 py-0.5 rounded">
+                          {member.region}
+                        </span>
+                      </div>
+                      {member.managerId && (
+                        <div className="text-xs text-gray-500">
+                          Manager: {state.teamMembers.find(m => m.id === member.managerId)?.name || 'Unknown'}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex gap-2">

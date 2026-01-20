@@ -15,18 +15,22 @@ export function MemberForm({ member, onClose }: MemberFormProps) {
     .filter(m => m.id !== member?.id)
     .map(m => m.color);
 
+  // Get available managers (exclude current member)
+  const availableManagers = state.teamMembers.filter(m => m.id !== member?.id);
+
   const [name, setName] = useState(member?.name || '');
   const [color, setColor] = useState(member?.color || getNextColor(usedColors));
   const [region, setRegion] = useState<Region>(member?.region || 'BC');
+  const [managerId, setManagerId] = useState<string | null>(member?.managerId || null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
     if (member) {
-      updateMember({ ...member, name: name.trim(), color, region });
+      updateMember({ ...member, name: name.trim(), color, region, managerId });
     } else {
-      addMember({ name: name.trim(), color, region });
+      addMember({ name: name.trim(), color, region, managerId });
     }
     onClose();
   };
@@ -68,6 +72,24 @@ export function MemberForm({ member, onClose }: MemberFormProps) {
                 {REGIONS.map(r => (
                   <option key={r} value={r}>
                     {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Direct Manager
+              </label>
+              <select
+                value={managerId || ''}
+                onChange={e => setManagerId(e.target.value || null)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              >
+                <option value="">None</option>
+                {availableManagers.map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
                   </option>
                 ))}
               </select>

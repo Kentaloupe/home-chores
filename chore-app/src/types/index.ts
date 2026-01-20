@@ -13,6 +13,7 @@ export interface TeamMember {
   name: string;
   color: string;
   region: Region;
+  managerId: string | null; // Reference to another TeamMember as Direct Manager
   owner: string;
 }
 
