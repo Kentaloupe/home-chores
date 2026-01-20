@@ -8,6 +8,7 @@ interface PBActivity {
   assignee: string;
   start_date: string;
   end_date: string;
+  hours_per_day: number;
   recurrence_rule: string;
   owner: string;
 }
@@ -20,6 +21,7 @@ function pbActivityToActivity(record: PBActivity, completedDates: string[]): Act
     assigneeId: record.assignee || null,
     startDate: record.start_date,
     endDate: record.end_date || undefined,
+    hoursPerDay: record.hours_per_day || undefined,
     recurrenceRule: record.recurrence_rule || undefined,
     completed: completedDates,
     owner: record.owner,
@@ -54,6 +56,7 @@ export async function createActivity(
     assignee: activity.assigneeId || '',
     start_date: activity.startDate,
     end_date: activity.endDate || '',
+    hours_per_day: activity.hoursPerDay || 0,
     recurrence_rule: activity.recurrenceRule || '',
     owner: ownerId,
   });
@@ -64,6 +67,7 @@ export async function createActivity(
     assigneeId: record.assignee || null,
     startDate: record.start_date,
     endDate: record.end_date || undefined,
+    hoursPerDay: record.hours_per_day || undefined,
     recurrenceRule: record.recurrence_rule || undefined,
     completed: [],
     owner: ownerId,
@@ -77,6 +81,7 @@ export async function updateActivity(activity: Activity): Promise<Activity> {
     assignee: activity.assigneeId || '',
     start_date: activity.startDate,
     end_date: activity.endDate || '',
+    hours_per_day: activity.hoursPerDay || 0,
     recurrence_rule: activity.recurrenceRule || '',
   });
   return {
@@ -86,6 +91,7 @@ export async function updateActivity(activity: Activity): Promise<Activity> {
     assigneeId: record.assignee || null,
     startDate: record.start_date,
     endDate: record.end_date || undefined,
+    hoursPerDay: record.hours_per_day || undefined,
     recurrenceRule: record.recurrence_rule || undefined,
     completed: activity.completed,
     owner: activity.owner,

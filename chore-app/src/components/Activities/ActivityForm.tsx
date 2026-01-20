@@ -34,6 +34,9 @@ export function ActivityForm({ activity, initialDate, onClose }: ActivityFormPro
   const [endDate, setEndDate] = useState(
     activity?.endDate?.split('T')[0] || ''
   );
+  const [hoursPerDay, setHoursPerDay] = useState<number | ''>(
+    activity?.hoursPerDay || ''
+  );
   const [recurrenceConfig, setRecurrenceConfig] = useState<RecurrenceConfig>(
     parseRRuleToConfig(activity?.recurrenceRule)
   );
@@ -62,6 +65,7 @@ export function ActivityForm({ activity, initialDate, onClose }: ActivityFormPro
         assigneeId,
         startDate,
         endDate: endDate || undefined,
+        hoursPerDay: hoursPerDay || undefined,
         recurrenceRule,
       });
     } else {
@@ -71,6 +75,7 @@ export function ActivityForm({ activity, initialDate, onClose }: ActivityFormPro
         assigneeId,
         startDate,
         endDate: endDate || undefined,
+        hoursPerDay: hoursPerDay || undefined,
         recurrenceRule,
       });
     }
@@ -181,6 +186,23 @@ export function ActivityForm({ activity, initialDate, onClose }: ActivityFormPro
                   disabled={isReadOnly}
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Hours Per Day
+              </label>
+              <input
+                type="number"
+                value={hoursPerDay}
+                onChange={e => setHoursPerDay(e.target.value ? Number(e.target.value) : '')}
+                min={0}
+                max={24}
+                step={0.5}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
+                placeholder="e.g., 8"
+                disabled={isReadOnly}
+              />
             </div>
 
             {!isReadOnly && (

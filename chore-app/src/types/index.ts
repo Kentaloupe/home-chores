@@ -24,6 +24,7 @@ export interface Activity {
   assigneeId: string | null;
   startDate: string; // ISO date string
   endDate?: string; // ISO date string (optional, for multi-day activities)
+  hoursPerDay?: number; // Number of hours per day for this activity
   recurrenceRule?: string; // RRule string (e.g., "FREQ=WEEKLY;BYDAY=MO")
   completed: string[]; // Array of completed occurrence dates (ISO strings)
   owner: string; // User ID who created this activity
