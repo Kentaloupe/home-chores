@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import type { Chore } from '../../types';
+import type { Activity } from '../../types';
 import { RecurrenceSelector } from './RecurrenceSelector';
 import type { RecurrenceConfig } from '../../utils/recurrence';
 import {
@@ -10,38 +10,38 @@ import {
   parseRRuleToConfig,
 } from '../../utils/recurrence';
 
-interface ChoreFormProps {
-  chore?: Chore | null;
+interface ActivityFormProps {
+  activity?: Activity | null;
   initialDate?: string;
   onClose: () => void;
 }
 
-export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
-  const { state, addChore, updateChore, deleteChore } = useApp();
+export function ActivityForm({ activity, initialDate, onClose }: ActivityFormProps) {
+  const { state, addActivity, updateActivity, deleteActivity } = useApp();
   const { user } = useAuth();
-  const isOwner = !chore || chore.owner === user?.id;
+  const isOwner = !activity || activity.owner === user?.id;
   const canEdit = isOwner || user?.isAdmin;
-  const isReadOnly = !!(chore && !canEdit);
+  const isReadOnly = !!(activity && !canEdit);
 
-  const [title, setTitle] = useState(chore?.title || '');
-  const [description, setDescription] = useState(chore?.description || '');
-  const [assigneeId, setAssigneeId] = useState<string | null>(chore?.assigneeId || null);
+  const [title, setTitle] = useState(activity?.title || '');
+  const [description, setDescription] = useState(activity?.description || '');
+  const [assigneeId, setAssigneeId] = useState<string | null>(activity?.assigneeId || null);
   const [startDate, setStartDate] = useState(
-    chore?.startDate?.split('T')[0] ||
+    activity?.startDate?.split('T')[0] ||
     initialDate ||
     new Date().toISOString().split('T')[0]
   );
   const [recurrenceConfig, setRecurrenceConfig] = useState<RecurrenceConfig>(
-    parseRRuleToConfig(chore?.recurrenceRule)
+    parseRRuleToConfig(activity?.recurrenceRule)
   );
 
-  const [showRecurrence, setShowRecurrence] = useState(!!chore?.recurrenceRule);
+  const [showRecurrence, setShowRecurrence] = useState(!!activity?.recurrenceRule);
 
   useEffect(() => {
-    if (chore?.recurrenceRule) {
+    if (activity?.recurrenceRule) {
       setShowRecurrence(true);
     }
-  }, [chore]);
+  }, [activity]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,9 +51,9 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
       ? configToRRule(recurrenceConfig, new Date(startDate))
       : undefined;
 
-    if (chore) {
-      updateChore({
-        ...chore,
+    if (activity) {
+      updateActivity({
+        ...activity,
         title: title.trim(),
         description: description.trim() || undefined,
         assigneeId,
@@ -61,7 +61,7 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
         recurrenceRule,
       });
     } else {
-      addChore({
+      addActivity({
         title: title.trim(),
         description: description.trim() || undefined,
         assigneeId,
@@ -73,8 +73,8 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
   };
 
   const handleDelete = () => {
-    if (chore && confirm('Delete this chore?')) {
-      deleteChore(chore.id);
+    if (activity && confirm('Delete this activity?')) {
+      deleteActivity(activity.id);
       onClose();
     }
   };
@@ -88,10 +88,10 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl font-semibold text-gray-900">
-                {chore ? (isReadOnly ? 'View Chore' : 'Edit Chore') : 'Add Chore'}
+                {activity ? (isReadOnly ? 'View Activity' : 'Edit Activity') : 'Add Activity'}
               </h2>
               {isReadOnly && (
-                <p className="text-sm text-gray-500 mt-1">You can only view this chore (created by another user)</p>
+                <p className="text-sm text-gray-500 mt-1">You can only view this activity (created by another user)</p>
               )}
             </div>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -111,7 +111,7 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
-                placeholder="e.g., Clean the kitchen"
+                placeholder="e.g., Site visit"
                 autoFocus
                 disabled={isReadOnly}
               />
@@ -174,9 +174,9 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                   {showRecurrence ? 'Hide recurrence options' : 'Add recurrence'}
-                  {chore?.recurrenceRule && !showRecurrence && (
+                  {activity?.recurrenceRule && !showRecurrence && (
                     <span className="text-gray-500 font-normal">
-                      ({describeRecurrence(chore.recurrenceRule)})
+                      ({describeRecurrence(activity.recurrenceRule)})
                     </span>
                   )}
                 </button>
@@ -191,16 +191,16 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
                 )}
               </div>
             )}
-            {isReadOnly && chore?.recurrenceRule && (
+            {isReadOnly && activity?.recurrenceRule && (
               <div className="border-t pt-4">
                 <p className="text-sm text-gray-600">
-                  <span className="font-medium">Recurrence:</span> {describeRecurrence(chore.recurrenceRule)}
+                  <span className="font-medium">Recurrence:</span> {describeRecurrence(activity.recurrenceRule)}
                 </p>
               </div>
             )}
 
             <div className="flex gap-3 pt-4">
-              {chore && canEdit && (
+              {activity && canEdit && (
                 <button
                   type="button"
                   onClick={handleDelete}
@@ -223,7 +223,7 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
                   disabled={!title.trim()}
                   className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
                 >
-                  {chore ? 'Save' : 'Add Chore'}
+                  {activity ? 'Save' : 'Add Activity'}
                 </button>
               )}
             </div>

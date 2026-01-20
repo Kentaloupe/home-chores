@@ -14,16 +14,16 @@ export function NotificationBadge() {
     let upcomingCount = 0;
     let overdueCount = 0;
 
-    for (const chore of state.chores) {
-      const startDate = new Date(chore.startDate);
+    for (const activity of state.activities) {
+      const startDate = new Date(activity.startDate);
 
-      if (chore.recurrenceRule) {
+      if (activity.recurrenceRule) {
         // Check occurrences
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 7);
 
         const occurrences = getOccurrences(
-          chore.recurrenceRule,
+          activity.recurrenceRule,
           startDate,
           yesterday,
           tomorrow
@@ -31,7 +31,7 @@ export function NotificationBadge() {
 
         for (const occ of occurrences) {
           const dateStr = occ.toISOString().split('T')[0];
-          const isCompleted = chore.completed.includes(dateStr);
+          const isCompleted = activity.completed.includes(dateStr);
           if (isCompleted) continue;
 
           const occDate = new Date(occ.getFullYear(), occ.getMonth(), occ.getDate());
@@ -42,21 +42,21 @@ export function NotificationBadge() {
           }
         }
       } else {
-        const dateStr = chore.startDate.split('T')[0];
-        const isCompleted = chore.completed.includes(dateStr);
+        const dateStr = activity.startDate.split('T')[0];
+        const isCompleted = activity.completed.includes(dateStr);
         if (isCompleted) continue;
 
-        const choreDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-        if (choreDate < today) {
+        const activityDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        if (activityDate < today) {
           overdueCount++;
-        } else if (choreDate >= today && choreDate < tomorrow) {
+        } else if (activityDate >= today && activityDate < tomorrow) {
           upcomingCount++;
         }
       }
     }
 
     return { upcoming: upcomingCount, overdue: overdueCount };
-  }, [state.chores]);
+  }, [state.activities]);
 
   if (upcoming === 0 && overdue === 0) {
     return null;

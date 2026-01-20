@@ -1,13 +1,13 @@
 import { createContext, useContext, useReducer, useEffect, useState, useCallback, type ReactNode } from 'react';
-import type { AppState, AppAction, TeamMember, Chore } from '../types';
+import type { AppState, AppAction, TeamMember, Activity } from '../types';
 import { fetchTeamMembers, createTeamMember, updateTeamMember as updateTeamMemberApi, deleteTeamMember as deleteTeamMemberApi } from '../services/teamMemberService';
-import { fetchChores, createChore, updateChore as updateChoreApi, deleteChore as deleteChoreApi } from '../services/choreService';
+import { fetchActivities, createActivity, updateActivity as updateActivityApi, deleteActivity as deleteActivityApi } from '../services/activityService';
 import { toggleCompletion } from '../services/completionService';
 import pb from '../services/pocketbase';
 
 const initialState: AppState = {
   teamMembers: [],
-  chores: [],
+  activities: [],
 };
 
 function appReducer(state: AppState, action: AppAction): AppState {
@@ -27,38 +27,38 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         teamMembers: state.teamMembers.filter(m => m.id !== action.payload),
-        chores: state.chores.map(c =>
-          c.assigneeId === action.payload ? { ...c, assigneeId: null } : c
+        activities: state.activities.map(a =>
+          a.assigneeId === action.payload ? { ...a, assigneeId: null } : a
         ),
       };
 
-    case 'ADD_CHORE':
-      return { ...state, chores: [...state.chores, action.payload] };
+    case 'ADD_ACTIVITY':
+      return { ...state, activities: [...state.activities, action.payload] };
 
-    case 'UPDATE_CHORE':
+    case 'UPDATE_ACTIVITY':
       return {
         ...state,
-        chores: state.chores.map(c =>
-          c.id === action.payload.id ? action.payload : c
+        activities: state.activities.map(a =>
+          a.id === action.payload.id ? action.payload : a
         ),
       };
 
-    case 'DELETE_CHORE':
+    case 'DELETE_ACTIVITY':
       return {
         ...state,
-        chores: state.chores.filter(c => c.id !== action.payload),
+        activities: state.activities.filter(a => a.id !== action.payload),
       };
 
-    case 'TOGGLE_CHORE_COMPLETION': {
-      const { choreId, date } = action.payload;
+    case 'TOGGLE_ACTIVITY_COMPLETION': {
+      const { activityId, date } = action.payload;
       return {
         ...state,
-        chores: state.chores.map(c => {
-          if (c.id !== choreId) return c;
-          const completed = c.completed.includes(date)
-            ? c.completed.filter(d => d !== date)
-            : [...c.completed, date];
-          return { ...c, completed };
+        activities: state.activities.map(a => {
+          if (a.id !== activityId) return a;
+          const completed = a.completed.includes(date)
+            ? a.completed.filter(d => d !== date)
+            : [...a.completed, date];
+          return { ...a, completed };
         }),
       };
     }
@@ -79,10 +79,10 @@ interface AppContextType {
   addMember: (member: Omit<TeamMember, 'id' | 'owner'>) => Promise<void>;
   updateMember: (member: TeamMember) => Promise<void>;
   deleteMember: (id: string) => Promise<void>;
-  addChore: (chore: Omit<Chore, 'id' | 'completed' | 'owner'>) => Promise<void>;
-  updateChore: (chore: Chore) => Promise<void>;
-  deleteChore: (id: string) => Promise<void>;
-  toggleChoreCompletion: (choreId: string, date: string) => Promise<void>;
+  addActivity: (activity: Omit<Activity, 'id' | 'completed' | 'owner'>) => Promise<void>;
+  updateActivity: (activity: Activity) => Promise<void>;
+  deleteActivity: (id: string) => Promise<void>;
+  toggleActivityCompletion: (activityId: string, date: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -95,11 +95,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const loadData = useCallback(async () => {
     try {
       setError(null);
-      const [teamMembers, chores] = await Promise.all([
+      const [teamMembers, activities] = await Promise.all([
         fetchTeamMembers(),
-        fetchChores(),
+        fetchActivities(),
       ]);
-      dispatch({ type: 'LOAD_STATE', payload: { teamMembers, chores } });
+      dispatch({ type: 'LOAD_STATE', payload: { teamMembers, activities } });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to load data';
       setError(message);
@@ -168,43 +168,43 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const addChore = async (chore: Omit<Chore, 'id' | 'completed' | 'owner'>) => {
+  const addActivity = async (activity: Omit<Activity, 'id' | 'completed' | 'owner'>) => {
     try {
-      const created = await createChore(chore);
-      dispatch({ type: 'ADD_CHORE', payload: created });
+      const created = await createActivity(activity);
+      dispatch({ type: 'ADD_ACTIVITY', payload: created });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to add chore';
+      const message = err instanceof Error ? err.message : 'Failed to add activity';
       setError(message);
       throw err;
     }
   };
 
-  const updateChore = async (chore: Chore) => {
+  const updateActivity = async (activity: Activity) => {
     try {
-      const updated = await updateChoreApi(chore);
-      dispatch({ type: 'UPDATE_CHORE', payload: updated });
+      const updated = await updateActivityApi(activity);
+      dispatch({ type: 'UPDATE_ACTIVITY', payload: updated });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to update chore';
+      const message = err instanceof Error ? err.message : 'Failed to update activity';
       setError(message);
       throw err;
     }
   };
 
-  const deleteChore = async (id: string) => {
+  const deleteActivity = async (id: string) => {
     try {
-      await deleteChoreApi(id);
-      dispatch({ type: 'DELETE_CHORE', payload: id });
+      await deleteActivityApi(id);
+      dispatch({ type: 'DELETE_ACTIVITY', payload: id });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete chore';
+      const message = err instanceof Error ? err.message : 'Failed to delete activity';
       setError(message);
       throw err;
     }
   };
 
-  const toggleChoreCompletionFn = async (choreId: string, date: string) => {
+  const toggleActivityCompletionFn = async (activityId: string, date: string) => {
     try {
-      await toggleCompletion(choreId, date);
-      dispatch({ type: 'TOGGLE_CHORE_COMPLETION', payload: { choreId, date } });
+      await toggleCompletion(activityId, date);
+      dispatch({ type: 'TOGGLE_ACTIVITY_COMPLETION', payload: { activityId, date } });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to toggle completion';
       setError(message);
@@ -230,10 +230,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         addMember,
         updateMember,
         deleteMember,
-        addChore,
-        updateChore,
-        deleteChore,
-        toggleChoreCompletion: toggleChoreCompletionFn,
+        addActivity,
+        updateActivity,
+        deleteActivity,
+        toggleActivityCompletion: toggleActivityCompletionFn,
       }}
     >
       {children}

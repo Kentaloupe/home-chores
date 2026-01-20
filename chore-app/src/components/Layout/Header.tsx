@@ -2,22 +2,22 @@ import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
 interface HeaderProps {
-  onAddChore: () => void;
+  onAddActivity: () => void;
   onManageTeam: () => void;
 }
 
-export function Header({ onAddChore, onManageTeam }: HeaderProps) {
+export function Header({ onAddActivity, onManageTeam }: HeaderProps) {
   const { state } = useApp();
   const { user, logout } = useAuth();
 
-  const upcomingCount = getUpcomingChoresCount(state.chores);
-  const overdueCount = getOverdueChoresCount(state.chores);
+  const upcomingCount = getUpcomingActivitiesCount(state.activities);
+  const overdueCount = getOverdueActivitiesCount(state.activities);
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold text-gray-900">Home Chores</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Pharmacy Field Team</h1>
           <div className="flex gap-2">
             {upcomingCount > 0 && (
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -39,10 +39,10 @@ export function Header({ onAddChore, onManageTeam }: HeaderProps) {
             Manage Team
           </button>
           <button
-            onClick={onAddChore}
+            onClick={onAddActivity}
             className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors"
           >
-            + Add Chore
+            + Add Activity
           </button>
           <div className="ml-4 pl-4 border-l border-gray-200 flex items-center gap-3">
             <span className="text-sm text-gray-600">{user?.email}</span>
@@ -59,33 +59,33 @@ export function Header({ onAddChore, onManageTeam }: HeaderProps) {
   );
 }
 
-function getUpcomingChoresCount(chores: { startDate: string; completed: string[]; recurrenceRule?: string }[]): number {
+function getUpcomingActivitiesCount(activities: { startDate: string; completed: string[]; recurrenceRule?: string }[]): number {
   const now = new Date();
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(23, 59, 59, 999);
 
   let count = 0;
-  for (const chore of chores) {
-    const choreDate = new Date(chore.startDate);
-    const dateStr = choreDate.toISOString().split('T')[0];
-    if (choreDate >= now && choreDate <= tomorrow && !chore.completed.includes(dateStr)) {
+  for (const activity of activities) {
+    const activityDate = new Date(activity.startDate);
+    const dateStr = activityDate.toISOString().split('T')[0];
+    if (activityDate >= now && activityDate <= tomorrow && !activity.completed.includes(dateStr)) {
       count++;
     }
   }
   return count;
 }
 
-function getOverdueChoresCount(chores: { startDate: string; completed: string[]; recurrenceRule?: string }[]): number {
+function getOverdueActivitiesCount(activities: { startDate: string; completed: string[]; recurrenceRule?: string }[]): number {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
   let count = 0;
-  for (const chore of chores) {
-    const choreDate = new Date(chore.startDate);
-    choreDate.setHours(0, 0, 0, 0);
-    const dateStr = choreDate.toISOString().split('T')[0];
-    if (choreDate < now && !chore.completed.includes(dateStr)) {
+  for (const activity of activities) {
+    const activityDate = new Date(activity.startDate);
+    activityDate.setHours(0, 0, 0, 0);
+    const dateStr = activityDate.toISOString().split('T')[0];
+    if (activityDate < now && !activity.completed.includes(dateStr)) {
       count++;
     }
   }

@@ -5,7 +5,7 @@ export interface TeamMember {
   owner: string;
 }
 
-export interface Chore {
+export interface Activity {
   id: string;
   title: string;
   description?: string;
@@ -13,22 +13,22 @@ export interface Chore {
   startDate: string; // ISO date string
   recurrenceRule?: string; // RRule string (e.g., "FREQ=WEEKLY;BYDAY=MO")
   completed: string[]; // Array of completed occurrence dates (ISO strings)
-  owner: string; // User ID who created this chore
+  owner: string; // User ID who created this activity
 }
 
 export interface AppState {
   teamMembers: TeamMember[];
-  chores: Chore[];
+  activities: Activity[];
 }
 
 export type AppAction =
   | { type: 'ADD_MEMBER'; payload: TeamMember }
   | { type: 'UPDATE_MEMBER'; payload: TeamMember }
   | { type: 'DELETE_MEMBER'; payload: string }
-  | { type: 'ADD_CHORE'; payload: Chore }
-  | { type: 'UPDATE_CHORE'; payload: Chore }
-  | { type: 'DELETE_CHORE'; payload: string }
-  | { type: 'TOGGLE_CHORE_COMPLETION'; payload: { choreId: string; date: string } }
+  | { type: 'ADD_ACTIVITY'; payload: Activity }
+  | { type: 'UPDATE_ACTIVITY'; payload: Activity }
+  | { type: 'DELETE_ACTIVITY'; payload: string }
+  | { type: 'TOGGLE_ACTIVITY_COMPLETION'; payload: { activityId: string; date: string } }
   | { type: 'LOAD_STATE'; payload: AppState };
 
 export interface RecurrenceOption {

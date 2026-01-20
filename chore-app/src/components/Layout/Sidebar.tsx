@@ -32,8 +32,8 @@ export function Sidebar() {
         </h2>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Total Chores</span>
-            <span className="font-medium text-gray-900">{state.chores.length}</span>
+            <span className="text-gray-600">Total Activities</span>
+            <span className="font-medium text-gray-900">{state.activities.length}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Team Size</span>
@@ -42,7 +42,7 @@ export function Sidebar() {
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Unassigned</span>
             <span className="font-medium text-gray-900">
-              {state.chores.filter(c => !c.assigneeId).length}
+              {state.activities.filter(a => !a.assigneeId).length}
             </span>
           </div>
         </div>

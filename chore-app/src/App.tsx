@@ -5,44 +5,44 @@ import { AppProvider } from './context/AppContext';
 import { Header } from './components/Layout/Header';
 import { Sidebar } from './components/Layout/Sidebar';
 import { CalendarView } from './components/Calendar/CalendarView';
-import { ChoreForm } from './components/Chores/ChoreForm';
+import { ActivityForm } from './components/Activities/ActivityForm';
 import { TeamList } from './components/Team/TeamList';
-import type { Chore } from './types';
+import type { Activity } from './types';
 
 function AppContent() {
-  const [showChoreForm, setShowChoreForm] = useState(false);
+  const [showActivityForm, setShowActivityForm] = useState(false);
   const [showTeamList, setShowTeamList] = useState(false);
-  const [editingChore, setEditingChore] = useState<Chore | null>(null);
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | undefined>();
 
-  const handleAddChore = () => {
-    setEditingChore(null);
+  const handleAddActivity = () => {
+    setEditingActivity(null);
     setSelectedDate(undefined);
-    setShowChoreForm(true);
+    setShowActivityForm(true);
   };
 
   const handleDateClick = (date: string) => {
-    setEditingChore(null);
+    setEditingActivity(null);
     setSelectedDate(date);
-    setShowChoreForm(true);
+    setShowActivityForm(true);
   };
 
-  const handleEventClick = (chore: Chore, _date: string) => {
-    setEditingChore(chore);
+  const handleEventClick = (activity: Activity, _date: string) => {
+    setEditingActivity(activity);
     setSelectedDate(undefined);
-    setShowChoreForm(true);
+    setShowActivityForm(true);
   };
 
-  const handleCloseChoreForm = () => {
-    setShowChoreForm(false);
-    setEditingChore(null);
+  const handleCloseActivityForm = () => {
+    setShowActivityForm(false);
+    setEditingActivity(null);
     setSelectedDate(undefined);
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       <Header
-        onAddChore={handleAddChore}
+        onAddActivity={handleAddActivity}
         onManageTeam={() => setShowTeamList(true)}
       />
 
@@ -57,11 +57,11 @@ function AppContent() {
         </main>
       </div>
 
-      {showChoreForm && (
-        <ChoreForm
-          chore={editingChore}
+      {showActivityForm && (
+        <ActivityForm
+          activity={editingActivity}
           initialDate={selectedDate}
-          onClose={handleCloseChoreForm}
+          onClose={handleCloseActivityForm}
         />
       )}
 

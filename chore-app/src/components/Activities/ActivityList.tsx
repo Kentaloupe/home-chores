@@ -1,13 +1,13 @@
 import { useApp } from '../../context/AppContext';
-import type { Chore } from '../../types';
+import type { Activity } from '../../types';
 import { describeRecurrence } from '../../utils/recurrence';
 
-interface ChoreListProps {
-  onEditChore: (chore: Chore) => void;
+interface ActivityListProps {
+  onEditActivity: (activity: Activity) => void;
 }
 
-export function ChoreList({ onEditChore }: ChoreListProps) {
-  const { state, toggleChoreCompletion } = useApp();
+export function ActivityList({ onEditActivity }: ActivityListProps) {
+  const { state, toggleActivityCompletion } = useApp();
 
   const getMemberColor = (assigneeId: string | null) => {
     if (!assigneeId) return '#9ca3af';
@@ -21,28 +21,28 @@ export function ChoreList({ onEditChore }: ChoreListProps) {
     return member?.name || 'Unknown';
   };
 
-  if (state.chores.length === 0) {
+  if (state.activities.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
-        <p>No chores yet. Click "Add Chore" to create one!</p>
+        <p>No activities yet. Click "Add Activity" to create one!</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-3">
-      {state.chores.map(chore => {
-        const dateStr = chore.startDate.split('T')[0];
-        const isCompleted = chore.completed.includes(dateStr);
+      {state.activities.map(activity => {
+        const dateStr = activity.startDate.split('T')[0];
+        const isCompleted = activity.completed.includes(dateStr);
 
         return (
           <div
-            key={chore.id}
+            key={activity.id}
             className={`p-4 bg-white rounded-lg border-l-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
               isCompleted ? 'opacity-60' : ''
             }`}
-            style={{ borderLeftColor: getMemberColor(chore.assigneeId) }}
-            onClick={() => onEditChore(chore)}
+            style={{ borderLeftColor: getMemberColor(activity.assigneeId) }}
+            onClick={() => onEditActivity(activity)}
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -50,7 +50,7 @@ export function ChoreList({ onEditChore }: ChoreListProps) {
                   <button
                     onClick={e => {
                       e.stopPropagation();
-                      toggleChoreCompletion(chore.id, dateStr);
+                      toggleActivityCompletion(activity.id, dateStr);
                     }}
                     className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                       isCompleted
@@ -65,24 +65,24 @@ export function ChoreList({ onEditChore }: ChoreListProps) {
                     )}
                   </button>
                   <h3 className={`font-medium text-gray-900 ${isCompleted ? 'line-through' : ''}`}>
-                    {chore.title}
+                    {activity.title}
                   </h3>
                 </div>
-                {chore.description && (
-                  <p className="mt-1 text-sm text-gray-600 ml-7">{chore.description}</p>
+                {activity.description && (
+                  <p className="mt-1 text-sm text-gray-600 ml-7">{activity.description}</p>
                 )}
                 <div className="mt-2 flex items-center gap-4 ml-7 text-xs text-gray-500">
                   <span className="flex items-center gap-1">
                     <span
                       className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: getMemberColor(chore.assigneeId) }}
+                      style={{ backgroundColor: getMemberColor(activity.assigneeId) }}
                     />
-                    {getMemberName(chore.assigneeId)}
+                    {getMemberName(activity.assigneeId)}
                   </span>
-                  <span>{new Date(chore.startDate).toLocaleDateString()}</span>
-                  {chore.recurrenceRule && (
+                  <span>{new Date(activity.startDate).toLocaleDateString()}</span>
+                  {activity.recurrenceRule && (
                     <span className="text-emerald-600">
-                      {describeRecurrence(chore.recurrenceRule)}
+                      {describeRecurrence(activity.recurrenceRule)}
                     </span>
                   )}
                 </div>

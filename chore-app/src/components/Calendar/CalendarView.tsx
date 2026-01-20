@@ -6,13 +6,13 @@ import interactionPlugin from '@fullcalendar/interaction';
 import type { EventClickArg } from '@fullcalendar/core';
 import type { DateClickArg } from '@fullcalendar/interaction';
 import { useApp } from '../../context/AppContext';
-import type { Chore } from '../../types';
+import type { Activity } from '../../types';
 import { getOccurrences } from '../../utils/recurrence';
 import { hexToRgba } from '../../utils/colors';
 
 interface CalendarViewProps {
   onDateClick: (date: string) => void;
-  onEventClick: (chore: Chore, date: string) => void;
+  onEventClick: (activity: Activity, date: string) => void;
 }
 
 interface CalendarEvent {
@@ -24,7 +24,7 @@ interface CalendarEvent {
   borderColor: string;
   textColor: string;
   extendedProps: {
-    choreId: string;
+    activityId: string;
     isCompleted: boolean;
     assigneeName: string;
   };
@@ -40,19 +40,19 @@ export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
     const rangeStart = new Date(now.getFullYear(), now.getMonth() - 2, 1);
     const rangeEnd = new Date(now.getFullYear(), now.getMonth() + 4, 0);
 
-    for (const chore of state.chores) {
-      const member = chore.assigneeId
-        ? state.teamMembers.find(m => m.id === chore.assigneeId)
+    for (const activity of state.activities) {
+      const member = activity.assigneeId
+        ? state.teamMembers.find(m => m.id === activity.assigneeId)
         : null;
       const color = member?.color || '#9ca3af';
       const assigneeName = member?.name || 'Unassigned';
 
-      const startDate = new Date(chore.startDate);
+      const startDate = new Date(activity.startDate);
 
-      if (chore.recurrenceRule) {
+      if (activity.recurrenceRule) {
         // Get all occurrences within the visible range
         const occurrences = getOccurrences(
-          chore.recurrenceRule,
+          activity.recurrenceRule,
           startDate,
           rangeStart,
           rangeEnd
@@ -60,18 +60,18 @@ export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
 
         for (const occurrence of occurrences) {
           const dateStr = occurrence.toISOString().split('T')[0];
-          const isCompleted = chore.completed.includes(dateStr);
+          const isCompleted = activity.completed.includes(dateStr);
 
           result.push({
-            id: `${chore.id}-${dateStr}`,
-            title: chore.title,
+            id: `${activity.id}-${dateStr}`,
+            title: activity.title,
             start: occurrence,
             allDay: true,
             backgroundColor: isCompleted ? hexToRgba(color, 0.3) : color,
             borderColor: color,
             textColor: isCompleted ? '#6b7280' : '#ffffff',
             extendedProps: {
-              choreId: chore.id,
+              activityId: activity.id,
               isCompleted,
               assigneeName,
             },
@@ -79,19 +79,19 @@ export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
         }
       } else {
         // Single occurrence
-        const dateStr = chore.startDate.split('T')[0];
-        const isCompleted = chore.completed.includes(dateStr);
+        const dateStr = activity.startDate.split('T')[0];
+        const isCompleted = activity.completed.includes(dateStr);
 
         result.push({
-          id: chore.id,
-          title: chore.title,
+          id: activity.id,
+          title: activity.title,
           start: startDate,
           allDay: true,
           backgroundColor: isCompleted ? hexToRgba(color, 0.3) : color,
           borderColor: color,
           textColor: isCompleted ? '#6b7280' : '#ffffff',
           extendedProps: {
-            choreId: chore.id,
+            activityId: activity.id,
             isCompleted,
             assigneeName,
           },
@@ -100,18 +100,18 @@ export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
     }
 
     return result;
-  }, [state.chores, state.teamMembers]);
+  }, [state.activities, state.teamMembers]);
 
   const handleDateClick = (info: DateClickArg) => {
     onDateClick(info.dateStr);
   };
 
   const handleEventClick = (info: EventClickArg) => {
-    const choreId = info.event.extendedProps.choreId;
-    const chore = state.chores.find(c => c.id === choreId);
-    if (chore) {
+    const activityId = info.event.extendedProps.activityId;
+    const activity = state.activities.find(a => a.id === activityId);
+    if (activity) {
       const dateStr = info.event.startStr.split('T')[0];
-      onEventClick(chore, dateStr);
+      onEventClick(activity, dateStr);
     }
   };
 
