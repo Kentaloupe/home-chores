@@ -1,6 +1,6 @@
 export const REGIONS = [
   'BC', 'AB', 'SK', 'MB',
-  'GTA-N', 'GTA-S', 'ON-E', 'ON-W',
+  'GTA-N', 'GTA-S', 'ON-E', 'ON-W', 'Central',
   'QC',
   'NS', 'NL', 'PE',
   'YK', 'NT', 'NWT'
