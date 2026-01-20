@@ -23,17 +23,21 @@ export function ActivityForm({ activity, initialDate, onClose }: ActivityFormPro
   const canEdit = isOwner || user?.isAdmin;
   const isReadOnly = !!(activity && !canEdit);
 
+  const parseDate = (dateStr?: string) => {
+    if (!dateStr) return '';
+    // Handle both ISO format (2024-01-20T00:00:00Z) and space format (2024-01-20 00:00:00)
+    return dateStr.split('T')[0].split(' ')[0];
+  };
+
   const [title, setTitle] = useState(activity?.title || '');
   const [description, setDescription] = useState(activity?.description || '');
   const [assigneeId, setAssigneeId] = useState<string | null>(activity?.assigneeId || null);
   const [startDate, setStartDate] = useState(
-    activity?.startDate?.split('T')[0] ||
+    parseDate(activity?.startDate) ||
     initialDate ||
     new Date().toISOString().split('T')[0]
   );
-  const [endDate, setEndDate] = useState(
-    activity?.endDate?.split('T')[0] || ''
-  );
+  const [endDate, setEndDate] = useState(parseDate(activity?.endDate));
   const [hoursPerDay, setHoursPerDay] = useState<number | ''>(
     activity?.hoursPerDay || ''
   );
@@ -43,11 +47,28 @@ export function ActivityForm({ activity, initialDate, onClose }: ActivityFormPro
 
   const [showRecurrence, setShowRecurrence] = useState(!!activity?.recurrenceRule);
 
+  // Sync form state when activity prop changes
   useEffect(() => {
-    if (activity?.recurrenceRule) {
-      setShowRecurrence(true);
+    if (activity) {
+      setTitle(activity.title || '');
+      setDescription(activity.description || '');
+      setAssigneeId(activity.assigneeId || null);
+      setStartDate(parseDate(activity.startDate) || new Date().toISOString().split('T')[0]);
+      setEndDate(parseDate(activity.endDate));
+      setHoursPerDay(activity.hoursPerDay || '');
+      setRecurrenceConfig(parseRRuleToConfig(activity.recurrenceRule));
+      setShowRecurrence(!!activity.recurrenceRule);
+    } else {
+      setTitle('');
+      setDescription('');
+      setAssigneeId(null);
+      setStartDate(initialDate || new Date().toISOString().split('T')[0]);
+      setEndDate('');
+      setHoursPerDay('');
+      setRecurrenceConfig(parseRRuleToConfig(undefined));
+      setShowRecurrence(false);
     }
-  }, [activity]);
+  }, [activity, initialDate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
