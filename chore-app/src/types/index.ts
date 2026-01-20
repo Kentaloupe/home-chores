@@ -1,7 +1,18 @@
+export const REGIONS = [
+  'BC', 'AB', 'SK', 'MB',
+  'GTA-N', 'GTA-S', 'ON-E', 'ON-W',
+  'QC',
+  'NS', 'NL', 'PE',
+  'YK', 'NT', 'NWT'
+] as const;
+
+export type Region = typeof REGIONS[number];
+
 export interface TeamMember {
   id: string;
   name: string;
   color: string;
+  region: Region;
   owner: string;
 }
 

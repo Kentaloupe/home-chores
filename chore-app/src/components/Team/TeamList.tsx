@@ -53,7 +53,12 @@ export function TeamList({ isOpen, onClose }: TeamListProps) {
                       className="w-4 h-4 rounded-full"
                       style={{ backgroundColor: member.color }}
                     />
-                    <span className="font-medium text-gray-900">{member.name}</span>
+                    <div>
+                      <span className="font-medium text-gray-900">{member.name}</span>
+                      <span className="ml-2 text-xs text-gray-500 bg-gray-200 px-1.5 py-0.5 rounded">
+                        {member.region}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     <button

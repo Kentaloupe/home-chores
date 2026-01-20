@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import type { TeamMember } from '../../types';
+import type { TeamMember, Region } from '../../types';
+import { REGIONS } from '../../types';
 import { MEMBER_COLORS, getNextColor } from '../../utils/colors';
 
 interface MemberFormProps {
@@ -16,15 +17,16 @@ export function MemberForm({ member, onClose }: MemberFormProps) {
 
   const [name, setName] = useState(member?.name || '');
   const [color, setColor] = useState(member?.color || getNextColor(usedColors));
+  const [region, setRegion] = useState<Region>(member?.region || 'BC');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
     if (member) {
-      updateMember({ ...member, name: name.trim(), color });
+      updateMember({ ...member, name: name.trim(), color, region });
     } else {
-      addMember({ name: name.trim(), color });
+      addMember({ name: name.trim(), color, region });
     }
     onClose();
   };
@@ -52,6 +54,23 @@ export function MemberForm({ member, onClose }: MemberFormProps) {
                 placeholder="Enter name"
                 autoFocus
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Region
+              </label>
+              <select
+                value={region}
+                onChange={e => setRegion(e.target.value as Region)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              >
+                {REGIONS.map(r => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
