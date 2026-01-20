@@ -40,7 +40,7 @@ export function Header({ onAddChore, onManageTeam }: HeaderProps) {
           </button>
           <button
             onClick={onAddChore}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors"
           >
             + Add Chore
           </button>

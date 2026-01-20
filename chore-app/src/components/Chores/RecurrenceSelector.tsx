@@ -20,7 +20,7 @@ export function RecurrenceSelector({ config, onChange }: RecurrenceSelectorProps
         <select
           value={config.frequency}
           onChange={e => updateConfig({ frequency: e.target.value as RecurrenceConfig['frequency'] })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
         >
           <option value="none">Does not repeat</option>
           <option value="daily">Daily</option>
@@ -42,7 +42,7 @@ export function RecurrenceSelector({ config, onChange }: RecurrenceSelectorProps
               max={99}
               value={config.interval}
               onChange={e => updateConfig({ interval: Math.max(1, parseInt(e.target.value) || 1) })}
-              className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
             />
             <span className="text-gray-600">
               {config.frequency === 'daily' && (config.interval === 1 ? 'day' : 'days')}
@@ -72,7 +72,7 @@ export function RecurrenceSelector({ config, onChange }: RecurrenceSelectorProps
                 }}
                 className={`w-10 h-10 text-xs font-medium rounded-lg transition-colors ${
                   config.weekdays.includes(index)
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-emerald-600 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -91,7 +91,7 @@ export function RecurrenceSelector({ config, onChange }: RecurrenceSelectorProps
           <select
             value={config.monthlyType}
             onChange={e => updateConfig({ monthlyType: e.target.value as 'dayOfMonth' | 'dayOfWeek' })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
           >
             <option value="dayOfMonth">Same day of month (e.g., 15th)</option>
             <option value="dayOfWeek">Same weekday (e.g., 2nd Tuesday)</option>
@@ -108,7 +108,7 @@ export function RecurrenceSelector({ config, onChange }: RecurrenceSelectorProps
             type="date"
             value={config.endDate || ''}
             onChange={e => updateConfig({ endDate: e.target.value || undefined })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
           />
         </div>
       )}

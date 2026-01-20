@@ -58,7 +58,7 @@ export function TeamList({ isOpen, onClose }: TeamListProps) {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setEditingMember(member)}
-                      className="text-sm text-indigo-600 hover:text-indigo-800"
+                      className="text-sm text-emerald-600 hover:text-emerald-800"
                     >
                       Edit
                     </button>
@@ -82,7 +82,7 @@ export function TeamList({ isOpen, onClose }: TeamListProps) {
 
           <button
             onClick={() => setIsAddingMember(true)}
-            className="w-full py-2 text-sm font-medium text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
+            className="w-full py-2 text-sm font-medium text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
           >
             + Add Team Member
           </button>

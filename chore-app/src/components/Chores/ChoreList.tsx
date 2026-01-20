@@ -55,7 +55,7 @@ export function ChoreList({ onEditChore }: ChoreListProps) {
                     className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                       isCompleted
                         ? 'bg-green-500 border-green-500 text-white'
-                        : 'border-gray-300 hover:border-indigo-500'
+                        : 'border-gray-300 hover:border-emerald-500'
                     }`}
                   >
                     {isCompleted && (
@@ -81,7 +81,7 @@ export function ChoreList({ onEditChore }: ChoreListProps) {
                   </span>
                   <span>{new Date(chore.startDate).toLocaleDateString()}</span>
                   {chore.recurrenceRule && (
-                    <span className="text-indigo-600">
+                    <span className="text-emerald-600">
                       {describeRecurrence(chore.recurrenceRule)}
                     </span>
                   )}

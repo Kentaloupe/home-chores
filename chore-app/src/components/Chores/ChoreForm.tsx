@@ -110,7 +110,7 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
                 type="text"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
                 placeholder="e.g., Clean the kitchen"
                 autoFocus
                 disabled={isReadOnly}
@@ -125,7 +125,7 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
                 placeholder="Add details..."
                 disabled={isReadOnly}
               />
@@ -138,7 +138,7 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
               <select
                 value={assigneeId || ''}
                 onChange={e => setAssigneeId(e.target.value || null)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
                 disabled={isReadOnly}
               >
                 <option value="">Unassigned</option>
@@ -158,7 +158,7 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
                 type="date"
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
                 disabled={isReadOnly}
               />
             </div>
@@ -168,7 +168,7 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
                 <button
                   type="button"
                   onClick={() => setShowRecurrence(!showRecurrence)}
-                  className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                  className="flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-800"
                 >
                   <svg className={`w-4 h-4 transition-transform ${showRecurrence ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -221,7 +221,7 @@ export function ChoreForm({ chore, initialDate, onClose }: ChoreFormProps) {
                 <button
                   type="submit"
                   disabled={!title.trim()}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
                 >
                   {chore ? 'Save' : 'Add Chore'}
                 </button>

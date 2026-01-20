@@ -48,7 +48,7 @@ export function MemberForm({ member, onClose }: MemberFormProps) {
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 placeholder="Enter name"
                 autoFocus
               />
@@ -84,7 +84,7 @@ export function MemberForm({ member, onClose }: MemberFormProps) {
               <button
                 type="submit"
                 disabled={!name.trim()}
-                className="flex-1 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {member ? 'Save' : 'Add'}
               </button>
