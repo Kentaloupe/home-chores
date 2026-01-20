@@ -7,6 +7,7 @@ interface PBActivity {
   description: string;
   assignee: string;
   start_date: string;
+  end_date: string;
   recurrence_rule: string;
   owner: string;
 }
@@ -18,6 +19,7 @@ function pbActivityToActivity(record: PBActivity, completedDates: string[]): Act
     description: record.description || undefined,
     assigneeId: record.assignee || null,
     startDate: record.start_date,
+    endDate: record.end_date || undefined,
     recurrenceRule: record.recurrence_rule || undefined,
     completed: completedDates,
     owner: record.owner,
@@ -51,6 +53,7 @@ export async function createActivity(
     description: activity.description || '',
     assignee: activity.assigneeId || '',
     start_date: activity.startDate,
+    end_date: activity.endDate || '',
     recurrence_rule: activity.recurrenceRule || '',
     owner: ownerId,
   });
@@ -60,6 +63,7 @@ export async function createActivity(
     description: record.description || undefined,
     assigneeId: record.assignee || null,
     startDate: record.start_date,
+    endDate: record.end_date || undefined,
     recurrenceRule: record.recurrence_rule || undefined,
     completed: [],
     owner: ownerId,
@@ -72,6 +76,7 @@ export async function updateActivity(activity: Activity): Promise<Activity> {
     description: activity.description || '',
     assignee: activity.assigneeId || '',
     start_date: activity.startDate,
+    end_date: activity.endDate || '',
     recurrence_rule: activity.recurrenceRule || '',
   });
   return {
@@ -80,6 +85,7 @@ export async function updateActivity(activity: Activity): Promise<Activity> {
     description: record.description || undefined,
     assigneeId: record.assignee || null,
     startDate: record.start_date,
+    endDate: record.end_date || undefined,
     recurrenceRule: record.recurrence_rule || undefined,
     completed: activity.completed,
     owner: activity.owner,

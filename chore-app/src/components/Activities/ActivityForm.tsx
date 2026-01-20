@@ -31,6 +31,9 @@ export function ActivityForm({ activity, initialDate, onClose }: ActivityFormPro
     initialDate ||
     new Date().toISOString().split('T')[0]
   );
+  const [endDate, setEndDate] = useState(
+    activity?.endDate?.split('T')[0] || ''
+  );
   const [recurrenceConfig, setRecurrenceConfig] = useState<RecurrenceConfig>(
     parseRRuleToConfig(activity?.recurrenceRule)
   );
@@ -58,6 +61,7 @@ export function ActivityForm({ activity, initialDate, onClose }: ActivityFormPro
         description: description.trim() || undefined,
         assigneeId,
         startDate,
+        endDate: endDate || undefined,
         recurrenceRule,
       });
     } else {
@@ -66,6 +70,7 @@ export function ActivityForm({ activity, initialDate, onClose }: ActivityFormPro
         description: description.trim() || undefined,
         assigneeId,
         startDate,
+        endDate: endDate || undefined,
         recurrenceRule,
       });
     }
@@ -150,17 +155,32 @@ export function ActivityForm({ activity, initialDate, onClose }: ActivityFormPro
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date
-              </label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
-                disabled={isReadOnly}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={e => setStartDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
+                  disabled={isReadOnly}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={e => setEndDate(e.target.value)}
+                  min={startDate}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
+                  disabled={isReadOnly}
+                />
+              </div>
             </div>
 
             {!isReadOnly && (

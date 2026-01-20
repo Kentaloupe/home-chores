@@ -19,6 +19,7 @@ interface CalendarEvent {
   id: string;
   title: string;
   start: Date;
+  end?: Date;
   allDay: boolean;
   backgroundColor: string;
   borderColor: string;
@@ -78,14 +79,22 @@ export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
           });
         }
       } else {
-        // Single occurrence
+        // Single or multi-day occurrence
         const dateStr = activity.startDate.split('T')[0];
         const isCompleted = activity.completed.includes(dateStr);
+
+        // Calculate end date for calendar (FullCalendar end is exclusive, so add 1 day)
+        let endDate: Date | undefined;
+        if (activity.endDate) {
+          endDate = new Date(activity.endDate);
+          endDate.setDate(endDate.getDate() + 1);
+        }
 
         result.push({
           id: activity.id,
           title: activity.title,
           start: startDate,
+          end: endDate,
           allDay: true,
           backgroundColor: isCompleted ? hexToRgba(color, 0.3) : color,
           borderColor: color,
