@@ -18,8 +18,8 @@ interface CalendarViewProps {
 interface CalendarEvent {
   id: string;
   title: string;
-  start: Date;
-  end?: Date;
+  start: string; // Use string format YYYY-MM-DD to avoid timezone issues
+  end?: string;
   allDay: boolean;
   backgroundColor: string;
   borderColor: string;
@@ -29,6 +29,12 @@ interface CalendarEvent {
     isCompleted: boolean;
     assigneeName: string;
   };
+}
+
+// Parse date string to YYYY-MM-DD format, handling various formats from PocketBase
+function parseToDateString(dateStr: string): string {
+  // Handle ISO format (2024-01-30T00:00:00Z) or space format (2024-01-30 00:00:00)
+  return dateStr.split('T')[0].split(' ')[0];
 }
 
 export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
@@ -48,7 +54,8 @@ export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
       const color = member?.color || '#9ca3af';
       const assigneeName = member?.name || 'Unassigned';
 
-      const startDate = new Date(activity.startDate);
+      const startDateStr = parseToDateString(activity.startDate);
+      const startDate = new Date(startDateStr + 'T00:00:00'); // Local timezone
 
       if (activity.recurrenceRule) {
         // Get all occurrences within the visible range
@@ -60,13 +67,17 @@ export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
         );
 
         for (const occurrence of occurrences) {
-          const dateStr = occurrence.toISOString().split('T')[0];
+          // Format as local date string to avoid timezone shift
+          const year = occurrence.getFullYear();
+          const month = String(occurrence.getMonth() + 1).padStart(2, '0');
+          const day = String(occurrence.getDate()).padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
           const isCompleted = activity.completed.includes(dateStr);
 
           result.push({
             id: `${activity.id}-${dateStr}`,
             title: activity.title,
-            start: occurrence,
+            start: dateStr,
             allDay: true,
             backgroundColor: isCompleted ? hexToRgba(color, 0.3) : color,
             borderColor: color,
@@ -80,21 +91,24 @@ export function CalendarView({ onDateClick, onEventClick }: CalendarViewProps) {
         }
       } else {
         // Single or multi-day occurrence
-        const dateStr = activity.startDate.split('T')[0];
-        const isCompleted = activity.completed.includes(dateStr);
+        const isCompleted = activity.completed.includes(startDateStr);
 
         // Calculate end date for calendar (FullCalendar end is exclusive, so add 1 day)
-        let endDate: Date | undefined;
+        let endDateStr: string | undefined;
         if (activity.endDate) {
-          endDate = new Date(activity.endDate);
+          const endDate = new Date(parseToDateString(activity.endDate) + 'T00:00:00');
           endDate.setDate(endDate.getDate() + 1);
+          const year = endDate.getFullYear();
+          const month = String(endDate.getMonth() + 1).padStart(2, '0');
+          const day = String(endDate.getDate()).padStart(2, '0');
+          endDateStr = `${year}-${month}-${day}`;
         }
 
         result.push({
           id: activity.id,
           title: activity.title,
-          start: startDate,
-          end: endDate,
+          start: startDateStr,
+          end: endDateStr,
           allDay: true,
           backgroundColor: isCompleted ? hexToRgba(color, 0.3) : color,
           borderColor: color,
